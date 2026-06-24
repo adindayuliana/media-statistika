@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Media Interaktif — Ukuran Pemusatan Data</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+  :root {
+    --teal: #0F766E;
+    --teal-light: #CCFBF1;
+    --teal-dark: #134E4A;
+    --teal-mid: #14B8A6;
+    --orange: #EA580C;
+    --orange-light: #FED7AA;
+    --yellow: #F59E0B;
+    --yellow-light: #FEF3C7;
+    --red: #DC2626;
+    --red-light: #FEE2E2;
+    --green: #16A34A;
+    --green-light: #DCFCE7;
+    --purple: #7C3AED;
+    --purple-light: #EDE9FE;
+    --gray-50: #F8FAFC;
+    --gray-100: #F1F5F9;
+    --gray-200: #E2E8F0;
+    --gray-400: #94A3B8;
+    --gray-600: #475569;
+    --gray-800: #1E293B;
+    --gray-900: #0F172A;
+    --bg: #F0FDFA;
+    --font: 'Plus Jakarta Sans', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg); color: var(--gray-800); min-height: 100vh; }
+
+  .header {
+    background: var(--teal-dark);
+    color: white;
+    padding: 32px 24px 28px;
+    text-align: center;
+  }
+  .header-badge {
+    display: inline-block;
+    background: var(--teal-mid);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 12px;
+  }
+  .header h1 { font-size: clamp(20px, 4vw, 28px); font-weight: 800; line-height: 1.2; margin-bottom: 8px; }
+  .header p { font-size: 14px; color: #99F6E4; font-weight: 500; }
+
+  .tabs {
+    display: flex;
+    background: white;
+    border-bottom: 2px solid var(--gray-200);
+    overflow-x: auto;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .tab {
+    flex: 1; min-width: 100px;
+    padding: 16px 10px;
+    border: none; background: none;
+    font-family: var(--font); font-size: 12px; font-weight: 600;
+    color: var(--gray-400); cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s; white-space: nowrap;
+  }
+  .tab:hover { color: var(--teal); }
+  .tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+
+  .panel { display: none; padding: 24px 16px; max-width: 760px; margin: 0 auto; }
+  .panel.active { display: block; }
+
+  .card {
+    background: white; border-radius: 16px; padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    border: 1px solid var(--gray-200);
+  }
+  .card-title {
+    font-size: 15px; font-weight: 700; color: var(--teal-dark);
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+  }
+  .card-title .icon {
+    width: 28px; height: 28px; background: var(--teal-light);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px;
+  }
+
+  .input-label { font-size: 13px; font-weight: 600; color: var(--gray-600); margin-bottom: 6px; display: block; }
+  .data-input {
+    width: 100%; padding: 12px 14px;
+    border: 2px solid var(--gray-200); border-radius: 10px;
+    font-family: var(--mono); font-size: 14px; color: var(--gray-800);
+    outline: none; transition: border-color 0.2s; resize: vertical; min-height: 80px;
+  }
+  .data-input:focus { border-color: var(--teal); }
+  .input-hint { font-size: 12px; color: var(--gray-400); margin-top: 6px; }
+
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .preset-btn {
+    padding: 6px 12px; border: 1.5px solid var(--teal); border-radius: 100px;
+    background: white; color: var(--teal); font-family: var(--font);
+    font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+  }
+  .preset-btn:hover { background: var(--teal); color: white; }
+
+  .btn-hitung {
+    width: 100%; margin-top: 16px; padding: 14px;
+    background: var(--teal); color: white; border: none; border-radius: 12px;
+    font-family: var(--font); font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s;
+  }
+  .btn-hitung:hover { background: var(--teal-dark); }
+
+  .results { display: none; margin-top: 20px; }
+  .results.show { display: block; }
+
+  .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  .result-box { border-radius: 12px; padding: 16px 12px; text-align: center; }
+  .result-box.mean { background: var(--orange-light); border: 1.5px solid #FDBA74; }
+  .result-box.median { background: var(--teal-light); border: 1.5px solid #5EEAD4; }
+  .result-box.modus { background: var(--yellow-light); border: 1.5px solid #FCD34D; }
+  .result-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+  .result-box.mean .result-label { color: var(--orange); }
+  .result-box.median .result-label { color: var(--teal-dark); }
+  .result-box.modus .result-label { color: #92400E; }
+  .result-value { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--gray-900); }
+
+  .steps-box { background: var(--gray-50); border: 1.5px solid var(--gray-200); border-radius: 12px; padding: 16px; }
+  .steps-title { font-size: 12px; font-weight: 700; color: var(--gray-600); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 12px; }
+  .step { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
+  .step-num {
+    min-width: 22px; height: 22px; background: var(--teal); color: white;
+    border-radius: 50%; font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+  }
+  .step-text { font-size: 13px; color: var(--gray-800); line-height: 1.5; }
+  .step-text code {
+    font-family: var(--mono); background: var(--teal-light); color: var(--teal-dark);
+    padding: 1px 5px; border-radius: 4px; font-size: 12px;
+  }
+
+  .data-viz { margin-top: 16px; padding: 16px; background: var(--gray-50); border-radius: 12px; border: 1.5px solid var(--gray-200); }
+  .data-viz-title { font-size: 12px; font-weight: 700; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .data-bubbles { display: flex; flex-wrap: wrap; gap: 6px; }
+  .bubble {
+    padding: 5px 10px; border-radius: 100px; font-family: var(--mono);
+    font-size: 13px; font-weight: 600; background: var(--gray-200); color: var(--gray-800); transition: all 0.3s;
+  }
+  .bubble.is-median { background: var(--teal-light); color: var(--teal-dark); border: 1.5px solid var(--teal-mid); }
+  .bubble.is-modus { background: var(--yellow-light); color: #92400E; border: 1.5px solid var(--yellow); }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--gray-600); font-weight: 500; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+
+  .kasus-header {
+    background: linear-gradient(135deg, var(--teal-dark), #1D4ED8);
+    border-radius: 12px; padding: 20px; color: white; margin-bottom: 20px;
+  }
+  .kasus-header h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .kasus-header p { font-size: 13px; color: #BAE6FD; line-height: 1.5; }
+
+  .slider-container { margin: 16px 0; }
+  .slider-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .slider-label span { font-size: 13px; font-weight: 600; color: var(--gray-600); }
+  .slider-value { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--orange); }
+  input[type=range] { width: 100%; height: 6px; border-radius: 3px; background: var(--gray-200); outline: none; -webkit-appearance: none; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--orange); cursor: pointer; box-shadow: 0 2px 6px rgba(234,88,12,0.4); }
+
+  .comparison-box { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .comp-card { padding: 16px; border-radius: 12px; text-align: center; }
+  .comp-card.mean-card { background: var(--orange-light); border: 1.5px solid #FDBA74; }
+  .comp-card.median-card { background: var(--teal-light); border: 1.5px solid #5EEAD4; }
+  .comp-card-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .comp-card.mean-card .comp-card-label { color: var(--orange); }
+  .comp-card.median-card .comp-card-label { color: var(--teal-dark); }
+  .comp-card-value { font-family: var(--mono); font-size: 20px; font-weight: 700; color: var(--gray-900); }
+  .comp-card-sub { font-size: 11px; color: var(--gray-600); margin-top: 4px; }
+
+  .insight-box {
+    margin-top: 16px; padding: 14px 16px; border-radius: 10px;
+    border-left: 4px solid var(--teal); background: var(--teal-light);
+    font-size: 13px; line-height: 1.6; color: var(--teal-dark);
+  }
+  .insight-box.warning { border-color: var(--orange); background: var(--orange-light); color: #7C2D12; }
+
+  .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 100px; margin: 12px 0; padding: 0 4px; }
+  .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+  .bar { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.4s ease; min-height: 4px; }
+  .bar-lbl { font-family: var(--mono); font-size: 10px; color: var(--gray-600); text-align: center; }
+
+  .konsep-card { border-radius: 14px; padding: 20px; margin-bottom: 16px; border: 1.5px solid; }
+  .konsep-card.mean-k { background: var(--orange-light); border-color: #FDBA74; }
+  .konsep-card.median-k { background: var(--teal-light); border-color: #5EEAD4; }
+  .konsep-card.modus-k { background: var(--yellow-light); border-color: #FCD34D; }
+  .konsep-name { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+  .konsep-card.mean-k .konsep-name { color: var(--orange); }
+  .konsep-card.median-k .konsep-name { color: var(--teal-dark); }
+  .konsep-card.modus-k .konsep-name { color: #92400E; }
+  .konsep-rumus { font-family: var(--mono); font-size: 14px; background: rgba(255,255,255,0.6); padding: 8px 12px; border-radius: 8px; margin: 10px 0; color: var(--gray-800); white-space: pre-line; }
+  .konsep-def { font-size: 13px; color: var(--gray-700); line-height: 1.6; margin-bottom: 10px; }
+  .konsep-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; }
+  .tag.plus { background: var(--green-light); color: var(--green); }
+  .tag.minus { background: var(--red-light); color: var(--red); }
+  .tag.use { background: white; color: var(--gray-600); border: 1px solid var(--gray-200); }
+
+  .error-msg { background: var(--red-light); color: var(--red); padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; margin-top: 8px; display: none; }
+
+  /* ===== DETEKTIF MODE ===== */
+  .detective-screen { display: none; }
+  .detective-screen.active { display: block; }
+
+  .det-header {
+    background: linear-gradient(135deg, #1E1B4B, #312E81);
+    border-radius: 16px; padding: 24px; color: white; margin-bottom: 20px;
+    position: relative; overflow: hidden;
+  }
+  .det-header::before {
+    content: '🔍';
+    position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+    font-size: 64px; opacity: 0.15;
+  }
+  .det-badge {
+    display: inline-block; background: var(--yellow); color: #1E1B4B;
+    font-size: 10px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 100px; margin-bottom: 10px;
+  }
+  .det-header h2 { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+  .det-header p { font-size: 13px; color: #C7D2FE; line-height: 1.5; }
+
+  .mission-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+  .mission-item {
+    background: white; border-radius: 14px; padding: 18px 20px;
+    border: 2px solid var(--gray-200); cursor: pointer;
+    transition: all 0.2s; display: flex; align-items: center; gap: 16px;
+  }
+  .mission-item:hover:not(.locked) { border-color: var(--teal); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(15,118,110,0.15); }
+  .mission-item.locked { opacity: 0.5; cursor: not-allowed; }
+  .mission-item.completed { border-color: var(--green); background: var(--green-light); }
+  .mission-icon { font-size: 28px; flex-shrink: 0; }
+  .mission-info { flex: 1; }
+  .mission-title { font-size: 14px; font-weight: 700; color: var(--gray-800); margin-bottom: 3px; }
+  .mission-desc { font-size: 12px; color: var(--gray-600); }
+  .mission-status { font-size: 20px; flex-shrink: 0; }
+  .stars { color: var(--yellow); font-size: 16px; letter-spacing: 2px; margin-top: 4px; }
+
+  /* Progress bar */
+  .progress-wrap { background: var(--gray-200); border-radius: 100px; height: 8px; margin: 12px 0; overflow: hidden; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--teal), var(--teal-mid)); border-radius: 100px; transition: width 0.5s ease; }
+
+  /* Case screen */
+  .case-screen { display: none; }
+  .case-screen.active { display: block; }
+
+  .case-header {
+    background: linear-gradient(135deg, #1E1B4B, #4C1D95);
+    border-radius: 14px; padding: 20px; color: white; margin-bottom: 16px;
+  }
+  .case-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .case-num { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #C7D2FE; text-transform: uppercase; }
+  .case-timer { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--yellow); }
+  .case-title { font-size: 17px; font-weight: 800; margin-bottom: 8px; }
+  .case-story { font-size: 13px; color: #C7D2FE; line-height: 1.6; }
+
+  .evidence-box {
+    background: var(--gray-900); border-radius: 12px; padding: 16px;
+    margin: 16px 0; font-family: var(--mono); font-size: 14px; color: #4ADE80;
+    border: 1px solid #374151;
+  }
+  .evidence-label { font-size: 10px; color: #6B7280; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .evidence-data { line-height: 1.8; }
+
+  .question-block { margin-bottom: 16px; }
+  .q-label { font-size: 12px; font-weight: 700; color: var(--purple); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .q-text { font-size: 14px; font-weight: 600; color: var(--gray-800); margin-bottom: 10px; line-height: 1.4; }
+
+  .answer-input {
+    width: 100%; padding: 12px 14px;
+    border: 2px solid var(--gray-200); border-radius: 10px;
+    font-family: var(--mono); font-size: 16px; color: var(--gray-800);
+    outline: none; transition: border-color 0.2s; text-align: center;
+  }
+  .answer-input:focus { border-color: var(--purple); }
+  .answer-input.correct { border-color: var(--green); background: var(--green-light); }
+  .answer-input.wrong { border-color: var(--red); background: var(--red-light); }
+
+  .mc-options { display: flex; flex-direction: column; gap: 8px; }
+  .mc-option {
+    padding: 12px 16px; border-radius: 10px; border: 2px solid var(--gray-200);
+    font-size: 13px; cursor: pointer; transition: all 0.15s; font-family: var(--font);
+    text-align: left; background: white; color: var(--gray-800);
+  }
+  .mc-option:hover { border-color: var(--purple); background: var(--purple-light); }
+  .mc-option.selected { border-color: var(--purple); background: var(--purple-light); font-weight: 600; }
+  .mc-option.correct { border-color: var(--green); background: var(--green-light); font-weight: 600; }
+  .mc-option.wrong { border-color: var(--red); background: var(--red-light); }
+
+  .btn-submit {
+    width: 100%; padding: 14px; border: none; border-radius: 12px;
+    font-family: var(--font); font-size: 15px; font-weight: 700; cursor: pointer;
+    background: var(--purple); color: white; margin-top: 16px; transition: background 0.2s;
+  }
+  .btn-submit:hover { background: #6D28D9; }
+  .btn-submit:disabled { background: var(--gray-400); cursor: not-allowed; }
+
+  .feedback-box {
+    display: none; margin-top: 16px; padding: 16px; border-radius: 12px;
+    font-size: 13px; line-height: 1.6;
+  }
+  .feedback-box.show { display: block; }
+  .feedback-box.correct { background: var(--green-light); border: 1.5px solid var(--green); color: #14532D; }
+  .feedback-box.wrong { background: var(--red-light); border: 1.5px solid var(--red); color: #7F1D1D; }
+  .feedback-title { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
+
+  .btn-next {
+    display: none; width: 100%; padding: 14px; border: none; border-radius: 12px;
+    font-family: var(--font); font-size: 15px; font-weight: 700; cursor: pointer;
+    background: var(--teal); color: white; margin-top: 12px; transition: background 0.2s;
+  }
+  .btn-next.show { display: block; }
+  .btn-next:hover { background: var(--teal-dark); }
+
+  /* Result screen */
+  .result-screen { display: none; text-align: center; }
+  .result-screen.active { display: block; }
+  .result-trophy { font-size: 72px; margin-bottom: 16px; animation: bounce 0.6s ease; }
+  @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
+  .result-title { font-size: 24px; font-weight: 800; color: var(--gray-900); margin-bottom: 8px; }
+  .result-subtitle { font-size: 14px; color: var(--gray-600); margin-bottom: 20px; }
+  .result-stars { font-size: 40px; letter-spacing: 8px; margin-bottom: 20px; }
+  .result-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+  .stat-box { background: white; border-radius: 12px; padding: 16px; border: 1.5px solid var(--gray-200); }
+  .stat-num { font-family: var(--mono); font-size: 24px; font-weight: 700; color: var(--teal); }
+  .stat-lbl { font-size: 12px; color: var(--gray-600); margin-top: 4px; }
+  .btn-back {
+    padding: 14px 32px; border: none; border-radius: 12px;
+    font-family: var(--font); font-size: 15px; font-weight: 700; cursor: pointer;
+    background: var(--teal); color: white; margin-top: 8px;
+  }
+  .btn-retry {
+    padding: 14px 32px; border: 2px solid var(--teal); border-radius: 12px;
+    font-family: var(--font); font-size: 15px; font-weight: 700; cursor: pointer;
+    background: white; color: var(--teal); margin-top: 8px; margin-right: 8px;
+  }
+
+  .hint-box {
+    background: var(--yellow-light); border: 1.5px solid var(--yellow);
+    border-radius: 10px; padding: 12px 14px; font-size: 12px; color: #78350F;
+    margin-top: 10px; display: none;
+  }
+  .hint-box.show { display: block; }
+  .hint-btn {
+    background: none; border: 1.5px dashed var(--yellow); border-radius: 8px;
+    color: #92400E; font-family: var(--font); font-size: 12px; font-weight: 600;
+    padding: 6px 12px; cursor: pointer; margin-top: 8px;
+  }
+
+  .footer { text-align: center; padding: 24px 16px; font-size: 12px; color: var(--gray-400); border-top: 1px solid var(--gray-200); margin-top: 12px; }
+
+  .badge-earned {
+    display: inline-block; background: var(--yellow); color: #1E1B4B;
+    font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 100px;
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-badge">Media Interaktif · Matematika Kelas X</div>
+  <h1>Ukuran Pemusatan Data Tunggal</h1>
+  <p>Mean · Median · Modus — Eksplorasi Langsung</p>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('kalkulator', this)">🧮 Kalkulator</button>
+  <button class="tab" onclick="switchTab('outlier', this)">⚠️ Outlier</button>
+  <button class="tab" onclick="switchTab('konsep', this)">📖 Konsep</button>
+  <button class="tab" onclick="switchTab('detektif', this)">🔍 Detektif</button>
+</div>
+
+<!-- TAB 1: KALKULATOR -->
+<div class="panel active" id="tab-kalkulator">
+  <div class="card">
+    <div class="card-title"><div class="icon">📊</div> Input Data</div>
+    <label class="input-label">Masukkan data (pisahkan dengan koma atau spasi):</label>
+    <textarea class="data-input" id="dataInput" placeholder="Contoh: 72, 85, 68, 90, 85, 75, 72, 88, 72, 93"></textarea>
+    <div class="input-hint">Data akan diurutkan otomatis sebelum menghitung Median.</div>
+    <div class="error-msg" id="errorMsg">⚠️ Data tidak valid. Pastikan semua angka dipisahkan koma atau spasi.</div>
+    <div class="presets">
+      <span style="font-size:12px;font-weight:600;color:var(--gray-400);align-self:center;">Coba data contoh:</span>
+      <button class="preset-btn" onclick="loadPreset('nilai')">Nilai Ujian</button>
+      <button class="preset-btn" onclick="loadPreset('gaji')">Gaji Karyawan</button>
+      <button class="preset-btn" onclick="loadPreset('sepatu')">Ukuran Sepatu</button>
+    </div>
+    <button class="btn-hitung" onclick="hitung()">Hitung Sekarang →</button>
+  </div>
+  <div class="results" id="results">
+    <div class="card">
+      <div class="card-title"><div class="icon">✅</div> Hasil Perhitungan</div>
+      <div class="result-grid">
+        <div class="result-box mean"><div class="result-label">Mean</div><div class="result-value" id="res-mean">—</div></div>
+        <div class="result-box median"><div class="result-label">Median</div><div class="result-value" id="res-median">—</div></div>
+        <div class="result-box modus"><div class="result-label">Modus</div><div class="result-value" id="res-modus">—</div></div>
+      </div>
+      <div class="data-viz">
+        <div class="data-viz-title">Data setelah diurutkan</div>
+        <div class="data-bubbles" id="dataBubbles"></div>
+        <div class="legend" id="legend"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="icon">📝</div> Langkah-langkah Perhitungan</div>
+      <div class="steps-box" id="stepsBox"></div>
+    </div>
+    <div class="card" id="interpretasiCard">
+      <div class="card-title"><div class="icon">💡</div> Interpretasi Otomatis</div>
+      <div id="interpretasiText"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2: EFEK OUTLIER -->
+<div class="panel" id="tab-outlier">
+  <div class="kasus-header">
+    <h3>Kasus: Gaji Karyawan PT Maju Bersama</h3>
+    <p>8 karyawan memiliki gaji berbeda-beda. Geser slider untuk mengubah gaji direktur (outlier) dan lihat apa yang terjadi pada Mean dan Median.</p>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="icon">👤</div> Gaji 7 Karyawan Biasa (tetap)</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;">
+      <span class="bubble">2.000</span><span class="bubble">2.500</span><span class="bubble">2.000</span>
+      <span class="bubble">2.500</span><span class="bubble">2.200</span><span class="bubble">2.300</span><span class="bubble">2.100</span>
+    </div>
+    <div style="font-size:12px;color:var(--gray-400);margin-top:4px;">dalam ribu rupiah</div>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="icon">⚡</div> Ubah Gaji Direktur</div>
+    <div class="slider-container">
+      <div class="slider-label">
+        <span>Gaji Direktur (ribu Rp)</span>
+        <span class="slider-value" id="sliderVal">2.000</span>
+      </div>
+      <input type="range" id="outlierSlider" min="2000" max="30000" value="2000" step="500" oninput="updateOutlier()">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--gray-400);margin-top:4px;">
+        <span>2.000 (setara karyawan)</span><span>30.000 (sangat tinggi)</span>
+      </div>
+    </div>
+    <div class="comparison-box">
+      <div class="comp-card mean-card"><div class="comp-card-label">Mean</div><div class="comp-card-value" id="outlier-mean">—</div><div class="comp-card-sub">rata-rata hitung</div></div>
+      <div class="comp-card median-card"><div class="comp-card-label">Median</div><div class="comp-card-value" id="outlier-median">—</div><div class="comp-card-sub">nilai tengah</div></div>
+    </div>
+    <div style="margin-top:16px;">
+      <div style="font-size:12px;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Visualisasi perubahan Mean vs Median</div>
+      <div class="bar-chart" id="outlierChart"></div>
+      <div style="display:flex;gap:12px;font-size:11px;">
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;background:var(--orange);border-radius:3px;display:inline-block;"></span>Mean</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;background:var(--teal);border-radius:3px;display:inline-block;"></span>Median</span>
+      </div>
+    </div>
+    <div class="insight-box" id="outlierInsight" style="margin-top:16px;"></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="icon">🔎</div> Kesimpulan Konsep</div>
+    <div class="insight-box"><strong>Mean sensitif terhadap outlier</strong> — satu nilai yang sangat besar atau kecil dapat menarik Mean jauh dari nilai-nilai lainnya.</div>
+    <div class="insight-box" style="margin-top:10px;"><strong>Median tahan terhadap outlier</strong> — karena Median hanya melihat posisi tengah setelah data diurutkan, nilainya tidak berubah drastis.</div>
+  </div>
+</div>
+
+<!-- TAB 3: KONSEP -->
+<div class="panel" id="tab-konsep">
+  <div class="konsep-card mean-k">
+    <div class="konsep-name">Mean (Rata-rata)</div>
+    <div class="konsep-def">Jumlah semua nilai data dibagi banyaknya data. Paling umum digunakan, tapi <strong>sensitif terhadap nilai ekstrem (outlier)</strong>.</div>
+    <div class="konsep-rumus">x̄ = (x₁ + x₂ + ... + xₙ) / n = Σxᵢ / n</div>
+    <div class="konsep-tags">
+      <span class="tag plus">✓ Menggunakan semua data</span>
+      <span class="tag plus">✓ Mudah dihitung</span>
+      <span class="tag minus">✗ Terpengaruh outlier</span>
+      <span class="tag use">📌 Cocok: data homogen tanpa outlier</span>
+    </div>
+  </div>
+  <div class="konsep-card median-k">
+    <div class="konsep-name">Median (Nilai Tengah)</div>
+    <div class="konsep-def">Nilai yang berada di tengah setelah data diurutkan. <strong>Tidak terpengaruh outlier</strong>.</div>
+    <div class="konsep-rumus">n ganjil: Me = x[(n+1)/2]
+n genap: Me = (x[n/2] + x[n/2+1]) / 2</div>
+    <div class="konsep-tags">
+      <span class="tag plus">✓ Tahan outlier</span>
+      <span class="tag plus">✓ Representatif untuk data miring</span>
+      <span class="tag minus">✗ Harus diurutkan dulu</span>
+      <span class="tag use">📌 Cocok: data dengan outlier (gaji, harga properti)</span>
+    </div>
+  </div>
+  <div class="konsep-card modus-k">
+    <div class="konsep-name">Modus (Nilai Terbanyak)</div>
+    <div class="konsep-def">Nilai yang paling sering muncul. Bisa lebih dari satu atau tidak ada.</div>
+    <div class="konsep-rumus">Mo = nilai dengan frekuensi tertinggi</div>
+    <div class="konsep-tags">
+      <span class="tag plus">✓ Cocok untuk data kategorik</span>
+      <span class="tag minus">✗ Bisa tidak ada / lebih dari satu</span>
+      <span class="tag use">📌 Cocok: ukuran baju/sepatu terlaris</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="icon">📋</div> Kapan Menggunakan Masing-masing?</div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead><tr style="background:var(--teal);color:white;"><th style="padding:10px;text-align:left;">Situasi</th><th style="padding:10px;text-align:center;">Gunakan</th></tr></thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:10px;">Data nilai ujian (tidak ada yang ekstrem)</td><td style="padding:10px;text-align:center;color:var(--orange);font-weight:700;">Mean</td></tr>
+          <tr style="background:var(--gray-50);border-bottom:1px solid var(--gray-200);"><td style="padding:10px;">Gaji karyawan (ada direktur bergaji sangat tinggi)</td><td style="padding:10px;text-align:center;color:var(--teal-dark);font-weight:700;">Median</td></tr>
+          <tr style="border-bottom:1px solid var(--gray-200);"><td style="padding:10px;">Ukuran sepatu paling banyak terjual</td><td style="padding:10px;text-align:center;color:#92400E;font-weight:700;">Modus</td></tr>
+          <tr style="background:var(--gray-50);"><td style="padding:10px;">Harga properti di suatu kota</td><td style="padding:10px;text-align:center;color:var(--teal-dark);font-weight:700;">Median</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 4: DETEKTIF DATA -->
+<div class="panel" id="tab-detektif">
+
+  <!-- LOBBY -->
+  <div class="detective-screen active" id="det-lobby">
+    <div class="det-header">
+      <div class="det-badge">🔍 Mode Investigasi</div>
+      <h2>Detektif Data</h2>
+      <p>Kamu adalah detektif yang bertugas memecahkan 3 kasus menggunakan statistika. Analisis data, jawab pertanyaan, dan ungkap kebenarannya!</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="icon">📁</div> Arsip Kasus</div>
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progressBar" style="width:0%"></div>
+      </div>
+      <div style="font-size:12px;color:var(--gray-400);margin-bottom:16px;" id="progressText">0 dari 3 kasus selesai</div>
+
+      <div class="mission-list">
+        <div class="mission-item" id="mission-0" onclick="startMission(0)">
+          <div class="mission-icon">📊</div>
+          <div class="mission-info">
+            <div class="mission-title">Kasus #1 — Nilai Ujian Bu Rina</div>
+            <div class="mission-desc">Bantu Bu Rina melaporkan kemampuan kelasnya secara jujur</div>
+            <div class="stars" id="stars-0">☆☆☆</div>
+          </div>
+          <div class="mission-status" id="status-0">▶️</div>
+        </div>
+        <div class="mission-item locked" id="mission-1" onclick="startMission(1)">
+          <div class="mission-icon">💰</div>
+          <div class="mission-info">
+            <div class="mission-title">Kasus #2 — Iklan Gaji Direktur</div>
+            <div class="mission-desc">Apakah klaim gaji rata-rata perusahaan itu jujur?</div>
+            <div class="stars" id="stars-1">🔒</div>
+          </div>
+          <div class="mission-status" id="status-1">🔒</div>
+        </div>
+        <div class="mission-item locked" id="mission-2" onclick="startMission(2)">
+          <div class="mission-icon">👟</div>
+          <div class="mission-info">
+            <div class="mission-title">Kasus #3 — Toko Sepatu Pak Yanto</div>
+            <div class="mission-desc">Tentukan ukuran sepatu yang harus diproduksi paling banyak</div>
+            <div class="stars" id="stars-2">🔒</div>
+          </div>
+          <div class="mission-status" id="status-2">🔒</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CASE SCREENS -->
+  <div class="case-screen" id="det-case">
+    <div class="case-header">
+      <div class="case-meta">
+        <span class="case-num" id="caseNum">Kasus #1</span>
+        <span class="case-timer" id="caseTimer">00:00</span>
+      </div>
+      <div class="case-title" id="caseTitle">—</div>
+      <div class="case-story" id="caseStory">—</div>
+    </div>
+
+    <div class="card">
+      <div class="evidence-box">
+        <div class="evidence-label">📋 Bukti / Data</div>
+        <div class="evidence-data" id="evidenceData">—</div>
+      </div>
+
+      <div id="questionsContainer"></div>
+
+      <button class="btn-submit" id="btnSubmit" onclick="submitCase()">Kirim Jawaban →</button>
+      <div class="feedback-box" id="feedbackBox">
+        <div class="feedback-title" id="feedbackTitle">—</div>
+        <div id="feedbackBody">—</div>
+      </div>
+      <button class="btn-next" id="btnNext" onclick="nextStep()">—</button>
+    </div>
+
+    <button style="background:none;border:none;color:var(--gray-400);font-size:13px;cursor:pointer;padding:8px;" onclick="backToLobby()">← Kembali ke Arsip Kasus</button>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div class="case-screen" id="det-result">
+    <div class="card" style="text-align:center;padding:32px 24px;">
+      <div class="result-trophy" id="resultTrophy">🏆</div>
+      <div class="result-title" id="resultTitle">—</div>
+      <div class="result-subtitle" id="resultSubtitle">—</div>
+      <div class="result-stars" id="resultStars">—</div>
+      <div class="result-stats">
+        <div class="stat-box"><div class="stat-num" id="statTime">—</div><div class="stat-lbl">Waktu</div></div>
+        <div class="stat-box"><div class="stat-num" id="statScore">—</div><div class="stat-lbl">Nilai</div></div>
+      </div>
+      <div id="badgeEarned" style="margin-bottom:16px;"></div>
+      <button class="btn-retry" onclick="retryCase()">🔄 Coba Lagi</button>
+      <button class="btn-back" onclick="backToLobby()">📁 Kembali</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  Disusun oleh Adinda Yuliana · NIM 24510040 · Pendidikan Matematika IKIP Siliwangi · Proyek UAS TIK 2026
+</div>
+
+<script>
+// ============ SHARED UTILS ============
+const presets = {
+  nilai: '72, 85, 68, 90, 85, 75, 72, 88, 72, 93',
+  gaji: '3500, 4000, 3500, 4000, 3500, 4000, 3500, 21000',
+  sepatu: '38, 40, 39, 40, 41, 38, 40, 42, 40, 39, 40, 38, 41, 40, 39'
+};
+
+function loadPreset(key) {
+  document.getElementById('dataInput').value = presets[key];
+  document.getElementById('errorMsg').style.display = 'none';
+  document.getElementById('results').classList.remove('show');
+}
+
+function parseData(str) {
+  return str.split(/[\s,;]+/).map(s => s.trim()).filter(s => s !== '').map(s => parseFloat(s.replace(',', '.')));
+}
+function calcMean(arr) { return arr.reduce((a, b) => a + b, 0) / arr.length; }
+function calcMedian(sorted) {
+  const n = sorted.length;
+  if (n % 2 === 1) return sorted[Math.floor(n / 2)];
+  return (sorted[n / 2 - 1] + sorted[n / 2]) / 2;
+}
+function calcModus(arr) {
+  const freq = {};
+  arr.forEach(v => freq[v] = (freq[v] || 0) + 1);
+  const maxFreq = Math.max(...Object.values(freq));
+  if (maxFreq === 1) return { values: [], freq: 1 };
+  return { values: Object.keys(freq).filter(k => freq[k] === maxFreq).map(Number), freq: maxFreq };
+}
+function fmt(n) { return Number.isInteger(n) ? n.toString() : n.toFixed(2).replace('.', ','); }
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  el.classList.add('active');
+}
+
+// ============ KALKULATOR ============
+function hitung() {
+  const raw = document.getElementById('dataInput').value;
+  const data = parseData(raw);
+  const errorMsg = document.getElementById('errorMsg');
+  if (data.length < 2 || data.some(isNaN)) {
+    errorMsg.style.display = 'block';
+    document.getElementById('results').classList.remove('show');
+    return;
+  }
+  errorMsg.style.display = 'none';
+  const sorted = [...data].sort((a, b) => a - b);
+  const mean = calcMean(sorted);
+  const median = calcMedian(sorted);
+  const modus = calcModus(sorted);
+  const n = sorted.length;
+
+  document.getElementById('res-mean').textContent = fmt(mean);
+  document.getElementById('res-median').textContent = fmt(median);
+  document.getElementById('res-modus').textContent = modus.values.length === 0 ? 'Tidak ada' : modus.values.map(fmt).join(', ');
+
+  const bubblesEl = document.getElementById('dataBubbles');
+  bubblesEl.innerHTML = '';
+  const medianIdx = n % 2 === 1 ? [Math.floor(n / 2)] : [n / 2 - 1, n / 2];
+  sorted.forEach((v, i) => {
+    const b = document.createElement('span');
+    b.className = 'bubble';
+    b.textContent = fmt(v);
+    if (medianIdx.includes(i)) b.classList.add('is-median');
+    if (modus.values.includes(v) && modus.values.length > 0) b.classList.add('is-modus');
+    bubblesEl.appendChild(b);
+  });
+
+  document.getElementById('legend').innerHTML = `
+    <div class="legend-item"><div class="legend-dot" style="background:var(--teal-light);border:1.5px solid var(--teal-mid)"></div>Nilai tengah (Median)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--yellow-light);border:1.5px solid var(--yellow)"></div>Modus</div>`;
+
+  const sum = sorted.reduce((a, b) => a + b, 0);
+  let stepsHTML = `<div class="steps-title">Langkah Perhitungan</div>`;
+  stepsHTML += `<div class="step"><div class="step-num">1</div><div class="step-text">Data diurutkan: <code>${sorted.map(fmt).join(', ')}</code> (n = ${n})</div></div>`;
+  stepsHTML += `<div class="step"><div class="step-num">2</div><div class="step-text">Jumlah semua data: <code>${fmt(sum)}</code></div></div>`;
+  stepsHTML += `<div class="step"><div class="step-num">3</div><div class="step-text">Mean = <code>${fmt(sum)} ÷ ${n} = ${fmt(mean)}</code></div></div>`;
+  if (n % 2 === 1) {
+    stepsHTML += `<div class="step"><div class="step-num">4</div><div class="step-text">n ganjil, Median = data ke-${Math.floor(n/2)+1} = <code>${fmt(sorted[Math.floor(n/2)])}</code></div></div>`;
+  } else {
+    stepsHTML += `<div class="step"><div class="step-num">4</div><div class="step-text">n genap, Median = (<code>${fmt(sorted[n/2-1])} + ${fmt(sorted[n/2])}</code>) ÷ 2 = <code>${fmt(median)}</code></div></div>`;
+  }
+  stepsHTML += modus.values.length === 0
+    ? `<div class="step"><div class="step-num">5</div><div class="step-text">Semua data muncul 1x → <code>Tidak ada Modus</code></div></div>`
+    : `<div class="step"><div class="step-num">5</div><div class="step-text">Nilai paling sering muncul (${modus.freq}x): <code>${modus.values.map(fmt).join(', ')}</code></div></div>`;
+  document.getElementById('stepsBox').innerHTML = stepsHTML;
+
+  const diff = Math.abs(mean - median);
+  const pct = (diff / mean) * 100;
+  let interpretasi = pct > 20
+    ? `<div class="insight-box warning">⚠️ <strong>Perhatian:</strong> Mean (${fmt(mean)}) dan Median (${fmt(median)}) berbeda cukup besar. Kemungkinan ada <strong>outlier</strong>. Median lebih representatif.</div>`
+    : pct > 5
+    ? `<div class="insight-box">📊 Mean (${fmt(mean)}) dan Median (${fmt(median)}) berbeda sekitar ${fmt(pct)}%. Data mungkin sedikit tidak simetris.</div>`
+    : `<div class="insight-box">✅ Mean (${fmt(mean)}) dan Median (${fmt(median)}) relatif dekat — data terdistribusi cukup simetris. Mean aman digunakan.</div>`;
+  document.getElementById('interpretasiText').innerHTML = interpretasi;
+  document.getElementById('results').classList.add('show');
+}
+
+// ============ OUTLIER ============
+function updateOutlier() {
+  const dirVal = parseInt(document.getElementById('outlierSlider').value);
+  document.getElementById('sliderVal').textContent = dirVal.toLocaleString('id-ID');
+  const data = [2000, 2500, 2000, 2500, 2200, 2300, 2100, dirVal];
+  const sorted = [...data].sort((a, b) => a - b);
+  const mean = calcMean(sorted);
+  const median = calcMedian(sorted);
+  document.getElementById('outlier-mean').textContent = fmt(mean / 1000) + ' jt';
+  document.getElementById('outlier-median').textContent = fmt(median / 1000) + ' jt';
+
+  const chartEl = document.getElementById('outlierChart');
+  const maxVal = Math.max(mean, median, 5000);
+  chartEl.innerHTML = '';
+  [{ label: 'Mean', val: mean, color: 'var(--orange)' }, { label: 'Median', val: median, color: 'var(--teal)' }].forEach(item => {
+    const h = Math.max(4, (item.val / maxVal) * 90);
+    chartEl.innerHTML += `<div class="bar-wrap"><div style="font-size:11px;font-family:var(--mono);color:var(--gray-600);margin-bottom:2px;">${fmt(item.val/1000)}</div><div class="bar" style="height:${h}px;background:${item.color};"></div><div class="bar-lbl">${item.label}</div></div>`;
+  });
+
+  const pct = (Math.abs(mean - median) / median) * 100;
+  const insightEl = document.getElementById('outlierInsight');
+  if (dirVal <= 3000) {
+    insightEl.className = 'insight-box';
+    insightEl.innerHTML = `✅ Gaji direktur setara karyawan lain. Mean (${fmt(mean/1000)} jt) dan Median (${fmt(median/1000)} jt) hampir sama — tidak ada distorsi.`;
+  } else if (dirVal <= 10000) {
+    insightEl.className = 'insight-box warning';
+    insightEl.innerHTML = `⚠️ Gaji direktur mulai jauh lebih tinggi. Mean (${fmt(mean/1000)} jt) mulai tertarik ke atas, Median (${fmt(median/1000)} jt) relatif stabil. Selisih: ${fmt(pct)}%.`;
+  } else {
+    insightEl.className = 'insight-box warning';
+    insightEl.innerHTML = `🚨 Outlier kuat. Mean terdistorsi menjadi ${fmt(mean/1000)} jt — jauh di atas gaji mayoritas karyawan. Median tetap ${fmt(median/1000)} jt dan jauh lebih jujur.`;
+  }
+}
+
+// ============ DETEKTIF ============
+const CASES = [
+  {
+    id: 0,
+    num: 'Kasus #1',
+    title: 'Nilai Ujian Bu Rina',
+    story: 'Bu Rina ingin melaporkan kemampuan kelasnya ke kepala sekolah. Ia memiliki data nilai ujian 10 siswa. Tugasmu: hitung Mean, Median, dan Modus, lalu bantu Bu Rina memilih angka yang paling jujur untuk dilaporkan.',
+    evidence: 'Nilai ujian 10 siswa:\n72, 85, 68, 90, 85, 75, 72, 88, 72, 93',
+    data: [72, 85, 68, 90, 85, 75, 72, 88, 72, 93],
+    questions: [
+      { type: 'number', label: 'Pertanyaan 1', text: 'Berapa Mean dari data tersebut?', answer: 80, tolerance: 0.1, hint: 'Jumlahkan semua nilai, lalu bagi dengan 10.' },
+      { type: 'number', label: 'Pertanyaan 2', text: 'Berapa Median dari data tersebut? (urutkan dulu)', answer: 80, tolerance: 0.1, hint: 'Urutkan data, n=10 (genap). Ambil rata-rata data ke-5 dan ke-6.' },
+      { type: 'mc', label: 'Pertanyaan 3 — Analisis', text: 'Nilai mana yang sebaiknya Bu Rina laporkan dan mengapa?',
+        options: ['Mean (80), karena menggunakan semua data dan data ini relatif merata — tidak ada nilai yang sangat ekstrem', 'Median (80), karena tidak terpengaruh nilai jelek', 'Modus (72), karena paling sering muncul jadi paling "mewakili"', 'Tidak ada — semua salah'],
+        answer: 0,
+        feedback_correct: '✅ Tepat! Untuk data nilai ujian yang relatif merata (tidak ada outlier), Mean adalah pilihan paling valid karena menggunakan seluruh informasi dari semua data. Kebetulan Mean dan Median sama-sama 80 di kasus ini — tanda data cukup simetris.',
+        feedback_wrong: '❌ Perhatikan: data nilai ujian ini tidak memiliki outlier ekstrem. Semua nilai berkisar 68–93, relatif merata. Dalam situasi seperti ini, Mean tetap valid dan bahkan lebih informatif karena menggunakan seluruh data.'
+      }
+    ],
+    badge: '📊 Analis Nilai',
+    time_limit: 180
+  },
+  {
+    id: 1,
+    num: 'Kasus #2',
+    title: 'Iklan Gaji Direktur',
+    story: 'PT Maju Bersama memasang iklan: "Rata-rata gaji karyawan kami Rp 6.500.000/bulan." Seorang pelamar kerja curiga iklan itu menyesatkan. Tugasmu: selidiki data gaji dan ungkap kebenarannya.',
+    evidence: 'Data gaji 8 karyawan (ribu Rp):\n2.000 | 2.500 | 2.000 | 2.500 | 2.200 | 2.300 | 2.100 | 15.000\n\nCatatan: nilai 15.000 adalah gaji direktur.',
+    data: [2000, 2500, 2000, 2500, 2200, 2300, 2100, 15000],
+    questions: [
+      { type: 'number', label: 'Pertanyaan 1', text: 'Berapa Mean gaji karyawan? (dalam ribu Rp)', answer: 3825, tolerance: 1, hint: 'Jumlahkan semua gaji: 2000+2500+2000+2500+2200+2300+2100+15000, lalu bagi 8.' },
+      { type: 'number', label: 'Pertanyaan 2', text: 'Berapa Median gaji karyawan? (dalam ribu Rp)', answer: 2250, tolerance: 1, hint: 'Urutkan 8 data, ambil rata-rata data ke-4 dan ke-5.' },
+      { type: 'mc', label: 'Pertanyaan 3 — Vonis Detektif', text: 'Apakah iklan "rata-rata gaji Rp 6.500.000" jujur menggambarkan kondisi karyawan?',
+        options: ['Jujur — Mean memang Rp 3.825.000, iklannya malah lebih rendah dari kenyataan', 'Tidak jujur secara konteks — Mean memang benar matematis, tapi terdistorsi gaji direktur (outlier). Median (Rp 2.250.000) jauh lebih merepresentasikan kondisi mayoritas 7 karyawan biasa', 'Tidak jujur — perhitungan Mean-nya salah', 'Tidak bisa disimpulkan tanpa data tambahan'],
+        answer: 1,
+        feedback_correct: '🔍 Vonis tepat! Mean memang secara matematis benar, tapi sangat menyesatkan karena 1 nilai ekstrem (gaji direktur Rp 15 juta) mendistorsi rata-rata jauh di atas realita 7 karyawan biasa (Rp 2–2,5 jt). Ini contoh nyata bagaimana statistika bisa disalahgunakan.',
+        feedback_wrong: '❌ Periksa lagi. Mean yang diklaim iklan (Rp 6,5 jt) ternyata tidak cocok dengan Mean yang kamu hitung (Rp 3,825 jt) — jadi angka iklannya pun tidak akurat. Tapi masalah utamanya bukan cuma itu: bahkan kalau angkanya benar, Mean tetap menyesatkan karena outlier gaji direktur.'
+      }
+    ],
+    badge: '🔍 Detektif Statistika',
+    time_limit: 180
+  },
+  {
+    id: 2,
+    num: 'Kasus #3',
+    title: 'Toko Sepatu Pak Yanto',
+    story: 'Pak Yanto akan memesan stok sepatu baru dari pabrik. Ia hanya punya budget untuk 1 ukuran yang diperbanyak. Tugasmu: analisis data penjualan dan rekomendasikan ukuran yang paling tepat untuk diproduksi paling banyak.',
+    evidence: 'Data ukuran sepatu terjual dalam 1 minggu (n=15):\n38, 40, 39, 40, 41, 38, 40, 42, 40, 39, 40, 38, 41, 40, 39',
+    data: [38, 40, 39, 40, 41, 38, 40, 42, 40, 39, 40, 38, 41, 40, 39],
+    questions: [
+      { type: 'number', label: 'Pertanyaan 1', text: 'Berapa Modus dari data ukuran sepatu tersebut?', answer: 40, tolerance: 0, hint: 'Hitung frekuensi kemunculan tiap ukuran: 38 muncul 3x, 39 muncul 3x, 40 muncul...?' },
+      { type: 'mc', label: 'Pertanyaan 2 — Rekomendasi', text: 'Ukuran pemusatan mana yang paling tepat digunakan Pak Yanto untuk menentukan ukuran yang harus dipesan paling banyak?',
+        options: ['Mean, karena rata-rata selalu jadi acuan terbaik dalam bisnis', 'Median, karena tahan terhadap outlier', 'Modus, karena Pak Yanto butuh tahu ukuran yang paling laku/sering terjual — bukan angka tengah atau rata-rata ukuran sepatu', 'Ketiganya sama baiknya untuk konteks ini'],
+        answer: 2,
+        feedback_correct: '👟 Rekomendasi tepat! Dalam konteks bisnis ritel (barang fisik seperti sepatu, baju, produk), Modus adalah ukuran yang paling relevan — bukan karena Mean atau Median salah, tapi karena pertanyaannya adalah "apa yang paling banyak dibutuhkan pelanggan?" — itu persis fungsi Modus.',
+        feedback_wrong: '❌ Bayangkan kamu pemilik toko: kamu tidak butuh tahu rata-rata ukuran kaki pelanggan (Mean), atau ukuran yang berada di tengah-tengah (Median) — kamu butuh tahu ukuran yang paling sering dibeli. Itulah Modus.'
+      }
+    ],
+    badge: '👟 Konsultan Bisnis',
+    time_limit: 150
+  }
+];
+
+let currentCase = null;
+let currentStep = 0;
+let timerInterval = null;
+let elapsedSeconds = 0;
+let caseStartTime = null;
+let missionResults = [null, null, null];
+let selectedMC = null;
+
+function startMission(idx) {
+  const missionEl = document.getElementById('mission-' + idx);
+  if (missionEl.classList.contains('locked')) return;
+  currentCase = CASES[idx];
+  currentStep = 0;
+  selectedMC = null;
+
+  document.getElementById('det-lobby').classList.remove('active');
+  document.getElementById('det-result').classList.remove('active');
+  document.getElementById('det-case').classList.add('active');
+
+  document.getElementById('caseNum').textContent = currentCase.num;
+  document.getElementById('caseTitle').textContent = currentCase.title;
+  document.getElementById('caseStory').textContent = currentCase.story;
+  document.getElementById('evidenceData').textContent = currentCase.evidence;
+
+  renderQuestion(0);
+  startTimer();
+}
+
+function renderQuestion(idx) {
+  const q = currentCase.questions[idx];
+  const container = document.getElementById('questionsContainer');
+  let html = `<div class="question-block"><div class="q-label">${q.label}</div><div class="q-text">${q.text}</div>`;
+
+  if (q.type === 'number') {
+    html += `<input type="number" class="answer-input" id="answerInput" placeholder="Ketik jawabanmu...">`;
+    if (q.hint) html += `<button class="hint-btn" onclick="toggleHint()">💡 Butuh petunjuk?</button><div class="hint-box" id="hintBox">${q.hint}</div>`;
+  } else {
+    html += `<div class="mc-options">` + q.options.map((opt, i) => `<button class="mc-option" onclick="selectMC(${i}, this)">${opt}</button>`).join('') + `</div>`;
+  }
+
+  html += `</div>`;
+  container.innerHTML = html;
+
+  document.getElementById('btnSubmit').disabled = false;
+  document.getElementById('btnSubmit').textContent = idx < currentCase.questions.length - 1 ? 'Periksa Jawaban →' : 'Kirim Vonis Akhir →';
+  document.getElementById('feedbackBox').className = 'feedback-box';
+  document.getElementById('btnNext').className = 'btn-next';
+  selectedMC = null;
+}
+
+function selectMC(idx, el) {
+  document.querySelectorAll('.mc-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedMC = idx;
+}
+
+function toggleHint() {
+  const h = document.getElementById('hintBox');
+  h.classList.toggle('show');
+}
+
+function submitCase() {
+  const q = currentCase.questions[currentStep];
+  let isCorrect = false;
+
+  if (q.type === 'number') {
+    const inp = document.getElementById('answerInput');
+    const val = parseFloat(inp.value);
+    if (isNaN(val)) { inp.style.borderColor = 'var(--red)'; return; }
+    isCorrect = Math.abs(val - q.answer) <= (q.tolerance || 0);
+    inp.classList.add(isCorrect ? 'correct' : 'wrong');
+  } else {
+    if (selectedMC === null) return;
+    isCorrect = selectedMC === q.answer;
+    document.querySelectorAll('.mc-option').forEach((o, i) => {
+      if (i === q.answer) o.classList.add('correct');
+      else if (i === selectedMC && !isCorrect) o.classList.add('wrong');
+    });
+  }
+
+  const feedbackBox = document.getElementById('feedbackBox');
+  const isLast = currentStep >= currentCase.questions.length - 1;
+
+  feedbackBox.className = 'feedback-box show ' + (isCorrect ? 'correct' : 'wrong');
+  document.getElementById('feedbackTitle').textContent = isCorrect ? '✅ Analisis Tepat!' : '❌ Periksa Lagi';
+  document.getElementById('feedbackBody').innerHTML = isCorrect
+    ? (q.feedback_correct || 'Jawaban benar! Lanjutkan investigasi.')
+    : (q.feedback_wrong || `Jawaban kurang tepat. Jawaban yang benar: <strong>${q.answer}</strong>`);
+
+  document.getElementById('btnSubmit').disabled = true;
+
+  const btnNext = document.getElementById('btnNext');
+  btnNext.className = 'btn-next show';
+  if (isLast) {
+    btnNext.textContent = 'Lihat Hasil Investigasi →';
+    btnNext.onclick = () => showResult(isCorrect);
+  } else {
+    btnNext.textContent = 'Lanjut ke Pertanyaan Berikutnya →';
+    btnNext.onclick = () => {
+      currentStep++;
+      renderQuestion(currentStep);
+    };
+  }
+}
+
+function showResult(lastCorrect) {
+  stopTimer();
+  const seconds = elapsedSeconds;
+  const limit = currentCase.time_limit;
+
+  let stars = 1;
+  if (seconds <= limit * 0.5) stars = 3;
+  else if (seconds <= limit * 0.8) stars = 2;
+
+  const starStr = '★'.repeat(stars) + '☆'.repeat(3 - stars);
+  missionResults[currentCase.id] = { stars, seconds };
+
+  document.getElementById('det-case').classList.remove('active');
+  document.getElementById('det-result').classList.add('active');
+
+  const trophies = ['🥉', '🥈', '🏆'];
+  document.getElementById('resultTrophy').textContent = trophies[stars - 1];
+  document.getElementById('resultTitle').textContent = stars === 3 ? 'Luar Biasa, Detektif!' : stars === 2 ? 'Investigasi Berhasil!' : 'Kasus Terpecahkan!';
+  document.getElementById('resultSubtitle').textContent = currentCase.title + ' — berhasil diselesaikan';
+  document.getElementById('resultStars').textContent = starStr;
+  document.getElementById('statTime').textContent = formatTime(seconds);
+  document.getElementById('statScore').textContent = stars * 33 + '%';
+  document.getElementById('badgeEarned').innerHTML = `<div class="badge-earned">${currentCase.badge} diraih!</div>`;
+
+  updateLobby();
+}
+
+function updateLobby() {
+  let completed = 0;
+  missionResults.forEach((r, i) => {
+    if (r !== null) {
+      completed++;
+      const starStr = '★'.repeat(r.stars) + '☆'.repeat(3 - r.stars);
+      document.getElementById('stars-' + i).textContent = starStr;
+      document.getElementById('status-' + i).textContent = '✅';
+      document.getElementById('mission-' + i).classList.add('completed');
+      if (i + 1 < 3) {
+        document.getElementById('mission-' + (i + 1)).classList.remove('locked');
+        document.getElementById('stars-' + (i + 1)).textContent = '☆☆☆';
+        document.getElementById('status-' + (i + 1)).textContent = '▶️';
+      }
+    }
+  });
+  document.getElementById('progressBar').style.width = (completed / 3 * 100) + '%';
+  document.getElementById('progressText').textContent = `${completed} dari 3 kasus selesai`;
+}
+
+function backToLobby() {
+  stopTimer();
+  document.getElementById('det-case').classList.remove('active');
+  document.getElementById('det-result').classList.remove('active');
+  document.getElementById('det-lobby').classList.add('active');
+  updateLobby();
+}
+
+function retryCase() {
+  const id = currentCase.id;
+  document.getElementById('det-result').classList.remove('active');
+  startMission(id);
+}
+
+function nextStep() {}
+
+function startTimer() {
+  stopTimer();
+  elapsedSeconds = 0;
+  caseStartTime = Date.now();
+  timerInterval = setInterval(() => {
+    elapsedSeconds = Math.floor((Date.now() - caseStartTime) / 1000);
+    document.getElementById('caseTimer').textContent = formatTime(elapsedSeconds);
+  }, 1000);
+}
+
+function stopTimer() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+}
+
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+}
+
+// Init
+updateOutlier();
+</script>
+</body>
+</html>
